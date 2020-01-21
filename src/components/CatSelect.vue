@@ -1,13 +1,26 @@
 <template>
   <div>
-    <p>Breed</p>
-    <select v-model="selected" v-on:change="selectCat(selected)">
-      <option selected>Select Breed</option>
-      <option v-bind:key="breed.id" v-for="breed in breeds" :value="breed.id">{{ breed.name }}</option>
-    </select>
-    <div v-if="cats.length === 0">No cats available.</div>
+    <b-row class="py-3">
+      <b-col sm="6" md="3" cols="12">
+        <b-form-group label="Breed">
+          <b-form-select v-model="selected" v-on:change="selectCat(selected)" class>
+            <option selected>Select Breed</option>
+            <option v-bind:key="breed.id" v-for="breed in breeds" :value="breed.id">{{ breed.name }}</option>
+          </b-form-select>
+        </b-form-group>
+        <div v-if="cats.length === 0">No cats available.</div>
+      </b-col>
+    </b-row>
     <CatCard v-bind:cats="cats" />
-    <button v-if="cats.length !== 0 && !isHidden" v-on:click="loadMoreCats($event, selected)">Load more</button>
+    <b-row>
+      <b-col>
+        <b-button
+          v-if="cats.length !== 0 && !isHidden"
+          v-on:click="loadMoreCats($event, selected)"
+          variant="success"
+        >Load more</b-button>
+      </b-col>
+    </b-row>
   </div>
 </template>
 
@@ -26,11 +39,11 @@ export default {
       cats: [],
       selected: "Select Breed",
       page: 1,
-      isHidden: false,
+      isHidden: false
     };
   },
   methods: {
-    selectCat (breed) {
+    selectCat(breed) {
       axios
         .get(
           `https://api.thecatapi.com/v1/images/search?page=1&limit=10&breed_id=${breed}`
@@ -47,16 +60,19 @@ export default {
         })
         .catch();
     },
-    loadMoreCats (event, breed) {
-      event.target.textContent = 'Loading cats...';
+    loadMoreCats(event, breed) {
+      event.target.textContent = "Loading cats...";
       this.page += 1;
 
-      axios.get(`https://api.thecatapi.com/v1/images/search?page=${this.page}&limit=10&breed_id=${breed}`)
+      axios
+        .get(
+          `https://api.thecatapi.com/v1/images/search?page=${this.page}&limit=10&breed_id=${breed}`
+        )
         .then(res => {
-          event.target.textContent = 'Load more';
-          
-          const tempCats = res.data.filter((el) => {
-            return !this.cats.some((cat) => {
+          event.target.textContent = "Load more";
+
+          const tempCats = res.data.filter(el => {
+            return !this.cats.some(cat => {
               return cat.id === el.id;
             });
           });
@@ -70,14 +86,14 @@ export default {
         .catch();
     }
   },
-  created () {
+  created() {
     const breed = this.$route.query.breed;
     if (breed) {
       this.selectCat(breed);
     }
     axios
       .get("https://api.thecatapi.com/v1/breeds")
-      .then(res => this.breeds = res.data)
+      .then(res => (this.breeds = res.data))
       .catch();
   }
 };

@@ -1,7 +1,8 @@
 <template>
-  <div class="home">
+  <b-container>
+    <h1>Cat Browser</h1>
     <CatSelect />
-  </div>
+  </b-container>
 </template>
 
 <script>
